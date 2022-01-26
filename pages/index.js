@@ -1,14 +1,41 @@
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+
 import appConfig from '../config.json';
-import { GlobalStyle } from "../GlobalStyle";
 import { Box, Button, Text, TextField, Image } from '@skynexui/components';
+
 import { Title } from '../components/Title';
 
-export default function PaginaInicial() {
-    const username = 'carollira';
+export default function Login() {
+    const unknownUserImage = 'https://cdn0.iconfinder.com/data/icons/set-ui-app-android/32/8-512.png';
+    const [username, setUsername] = useState('carollira');
+    const [userData, setUserData] = useState();
+    const [image, setImage] = useState(unknownUserImage);
+
+    const router = useRouter();
+
+    async function getUser() {
+        if (username.length > 2) {
+            try {
+                const response = await fetch(`https://api.github.com/users/${username}`);
+                const data = await response.json();
+                data.id ? setUserData(data) : setUserData({});
+                data.avatar_url ? setImage(data.avatar_url) : setImage(unknownUserImage);
+            } catch (error) {
+                console.log(error);
+                setImage(unknownUserImage);
+            }
+        } else {
+            setImage(unknownUserImage);
+        }
+    }
+
+    useEffect(() => {
+        getUser();
+    }, [username]);
 
     return (
         <>
-            <GlobalStyle />
             <Box
                 styleSheet={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -35,6 +62,10 @@ export default function PaginaInicial() {
                     {/* Formulário */}
                     <Box
                         as="form"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            router.push('/chat');
+                        }}
                         styleSheet={{
                             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                             width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
@@ -46,6 +77,8 @@ export default function PaginaInicial() {
                         </Text>
 
                         <TextField
+                            value={username}
+                            onChange={(event) => setUsername(event.target.value)}
                             fullWidth
                             textFieldColors={{
                                 neutral: {
@@ -81,7 +114,7 @@ export default function PaginaInicial() {
                             padding: '16px',
                             backgroundColor: appConfig.theme.colors.neutrals[800],
                             border: '1px solid',
-                            borderColor: appConfig.theme.colors.neutrals[999],
+                            borderColor: appConfig.theme.colors.primary[500],
                             borderRadius: '10px',
                             flex: 1,
                             minHeight: '240px',
@@ -92,8 +125,21 @@ export default function PaginaInicial() {
                                 borderRadius: '50%',
                                 marginBottom: '16px',
                             }}
-                            src={`https://github.com/${username}.png`}
+                            src={image}
                         />
+                        <Text
+                            variant="body4"
+                            styleSheet={{
+                                fontSize: '14px',
+                                color: appConfig.theme.colors.primary[100],
+                                backgroundColor: appConfig.theme.colors.neutrals[900],
+                                padding: '3px 10px',
+                                marginBottom: '10px',
+                                borderRadius: '1000px'
+                            }}
+                        >
+                            {username}
+                        </Text>
                         <Text
                             variant="body4"
                             styleSheet={{
@@ -103,7 +149,10 @@ export default function PaginaInicial() {
                                 borderRadius: '1000px'
                             }}
                         >
-                            {username}
+                            {userData &&
+                                `Repositórios: ${userData.public_repos || ''}`
+                            }
+
                         </Text>
                     </Box>
                     {/* Photo Area */}
