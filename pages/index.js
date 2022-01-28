@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-
-import appConfig from '../config.json';
 import { Box, Button, Text, TextField, Image } from '@skynexui/components';
 
+import appConfig from '../config.json';
+
 import { Title } from '../components/Title';
+
 
 export default function Login() {
     const unknownUserImage = 'https://cdn0.iconfinder.com/data/icons/set-ui-app-android/32/8-512.png';
@@ -38,10 +39,14 @@ export default function Login() {
         <>
             <Box
                 styleSheet={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     backgroundColor: appConfig.theme.colors.primary[500],
-                    backgroundImage: 'url(https://stickershop.line-scdn.net/sticonshop/v1/product/5fe59c1d54f13c078a4b7753/iPhone/main.png)',
-                    backgroundRepeat: 'repeat', backgroundSize: 'auto', backgroundBlendMode: 'multiply',
+                    backgroundImage: 'url("https://stickershop.line-scdn.net/sticonshop/v1/product/5fe59c1d54f13c078a4b7753/iPhone/main.png")',
+                    backgroundRepeat: 'repeat',
+                    backgroundSize: 'auto',
+                    backgroundBlendMode: 'multiply',
                 }}
             >
                 <Box
@@ -53,8 +58,11 @@ export default function Login() {
                             xs: 'column',
                             sm: 'row',
                         },
-                        width: '100%', maxWidth: '700px',
-                        borderRadius: '5px', padding: '32px', margin: '16px',
+                        width: '100%',
+                        maxWidth: '700px',
+                        borderRadius: '5px',
+                        padding: '32px',
+                        margin: '16px',
                         boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
                         backgroundColor: appConfig.theme.colors.neutrals[700],
                     }}
@@ -67,12 +75,25 @@ export default function Login() {
                             router.push('/chat');
                         }}
                         styleSheet={{
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                            width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: {
+                                xs: '100%',
+                                sm: '50%'
+                            },
+                            textAlign: 'center',
+                            marginBottom: '32px',
                         }}
                     >
                         <Title tag="h2">Boas vindas de volta!</Title>
-                        <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
+                        <Text
+                            variant="body3"
+                            styleSheet={{
+                                marginBottom: '32px',
+                                color: appConfig.theme.colors.neutrals[300]
+                            }}>
                             {appConfig.name}
                         </Text>
 
