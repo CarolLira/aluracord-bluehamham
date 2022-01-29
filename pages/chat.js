@@ -16,12 +16,19 @@ export default function ChatPage() {
             text: newMessage,
         }
 
-        setMessageHistory([
-            messageData,
-            ...messageHistory
+        if (newMessage) {
+            setMessageHistory([
+                messageData,
+                ...messageHistory
 
-        ]);
+            ]);
+        }
         setMessage('');
+    }
+
+    function handleRemoveMessage(messageId) {
+        const messages = messageHistory.filter((value) => value.id !== messageId);
+        setMessageHistory(messages);
     }
 
     return (
@@ -66,6 +73,7 @@ export default function ChatPage() {
                 >
                     <MessageList
                         messages={messageHistory}
+                        handleRemoveMessage={handleRemoveMessage}
                     />
                     <Box
                         as="form"
@@ -108,15 +116,16 @@ export default function ChatPage() {
                                 height: '44px',
                                 padding: '6px 8px',
                                 borderRadius: '5px',
+                                fontSize: '16px'
                             }}
                             styleSheet={{
                                 backgroundColor: appConfig.theme.colors.neutrals[800],
                                 marginRight: '12px',
                                 hover: {
-                                    backgroundColor: appConfig.theme.colors.primary[500]
+                                    backgroundColor: appConfig.theme.colors.primary[700]
                                 },
                                 focus: {
-                                    backgroundColor: appConfig.theme.colors.primary[500]
+                                    backgroundColor: appConfig.theme.colors.primary[700]
                                 }
                             }}
 
