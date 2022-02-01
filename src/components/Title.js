@@ -1,4 +1,4 @@
-import appConfig from '../config.json';
+import appConfig from '../../config.json';
 
 export function Title(props) {
     const Tag = props.tag || 'h1';

@@ -2,20 +2,49 @@ import { Box, Button, TextField } from '@skynexui/components';
 import React, { useEffect, useState } from 'react';
 import appConfig from '../config.json';
 
-import { Header } from '../components/Header';
-import { MessageList } from '../components/MessageList';
+import { Header } from '../src/components/Header';
+import { MessageList } from '../src/components/MessageList';
+import { StickerButton } from '../src/components/StickerButton';
 import { createClient } from '@supabase/supabase-js';
+import { useRouter } from 'next/router';
 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzU0NzM1NSwiZXhwIjoxOTU5MTIzMzU1fQ.-HN_qLXIyr2hS05qgKh58Q5uZlUbaOHs1ACbuFj9hvg';
 const SUPABASE_URL = 'https://tvmgdwwnhcuaukrsvrxl.supabase.co';
 
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function listenToRealTimeMessages(addNewMessage, getAllMessages) {
+    return supabaseClient
+        .from('messages')
+        .on('INSERT', (response) => addNewMessage(response.new))
+        .on('DELETE', () => getAllMessages())
+        .subscribe();
+}
+
 export default function ChatPage() {
+    const router = useRouter();
+    const loggedUser = router.query.username;
     const [message, setMessage] = useState('');
     const [messageHistory, setMessageHistory] = useState([]);
 
     useEffect(() => {
+        getAllMessages();
+
+        const subscription = listenToRealTimeMessages((newMessage) => {
+            setMessageHistory((currentList) => {
+                return [
+                    newMessage,
+                    ...currentList,
+                ]
+            });
+        }, getAllMessages);
+
+        return () => {
+            subscription.unsubscribe();
+        }
+    }, []);
+
+    function getAllMessages() {
         supabaseClient
             .from('messages')
             .select('*')
@@ -24,12 +53,11 @@ export default function ChatPage() {
                 console.log('Dados da consulta:', data);
                 setMessageHistory(data);
             });
-    }, []);
+    }
 
     function handleNewMessage(newMessage) {
         const messageData = {
-            // id: messageHistory.length + 1,
-            user: 'carollira',
+            user: loggedUser,
             text: newMessage,
         }
 
@@ -41,19 +69,19 @@ export default function ChatPage() {
                 ])
                 .then((response) => {
                     console.log('criando msg: ', response);
-                    setMessageHistory([
-                        response.data[0],
-                        ...messageHistory,
-                    ]);
                 });
         }
-
         setMessage('');
     }
 
     function handleRemoveMessage(messageId) {
-        const messages = messageHistory.filter((value) => value.id !== messageId);
-        setMessageHistory(messages);
+        supabaseClient
+            .from('messages')
+            .delete()
+            .match({ id: messageId })
+            .then((response) => {
+                console.log('criando msg: ', response);
+            });
     }
 
     return (
@@ -98,7 +126,7 @@ export default function ChatPage() {
                 >
                     <MessageList
                         messages={messageHistory}
-                        handleRemoveMessage={handleRemoveMessage}
+                        handleRemoveMessage={(id) => handleRemoveMessage(id)}
                     />
                     <Box
                         as="form"
@@ -125,9 +153,12 @@ export default function ChatPage() {
                                 borderRadius: '5px',
                                 padding: '6px 8px',
                                 backgroundColor: appConfig.theme.colors.neutrals[800],
-                                marginRight: '12px',
+                                marginRight: '10px',
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
+                        />
+                        <StickerButton
+                            onStickerClick={(sticker) => handleNewMessage(`:sticker: ${sticker}`)}
                         />
                         <Button
                             iconName='paperPlane'
@@ -137,7 +168,6 @@ export default function ChatPage() {
                                 handleNewMessage(message)
                             }}
                             style={{
-                                borderRadius: '0%',
                                 height: '44px',
                                 padding: '6px 8px',
                                 borderRadius: '5px',
