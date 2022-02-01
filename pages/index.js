@@ -4,7 +4,7 @@ import { Box, Button, Text, TextField, Image } from '@skynexui/components';
 
 import appConfig from '../config.json';
 
-import { Title } from '../components/Title';
+import { Title } from '../src/components/Title';
 
 
 export default function Login() {
@@ -72,7 +72,7 @@ export default function Login() {
                         as="form"
                         onSubmit={(event) => {
                             event.preventDefault();
-                            router.push('/chat');
+                            router.push(`/chat?username=${username}`);
                         }}
                         styleSheet={{
                             display: 'flex',

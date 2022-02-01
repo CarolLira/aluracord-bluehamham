@@ -1,4 +1,4 @@
-import appConfig from '../config.json';
+import appConfig from '../../config.json';
 import { Box, Text, Image, Button } from '@skynexui/components';
 
 export function MessageList(props) {
@@ -25,7 +25,7 @@ export function MessageList(props) {
                             key={message.id}
                             tag="li"
                             style={{
-                                width: '98.5%',
+                                minWidth: '98.5%',
                             }}
                             styleSheet={{
                                 borderRadius: '5px',
@@ -47,7 +47,7 @@ export function MessageList(props) {
                                         display: 'inline-block',
                                         marginRight: '8px',
                                     }}
-                                    src={`https://github.com/carollira.png`}
+                                    src={`https://github.com/${message.user}.png`}
                                 />
                                 <Text tag="strong">
                                     {message.user}
@@ -63,7 +63,17 @@ export function MessageList(props) {
                                     {(new Date().toLocaleDateString())}
                                 </Text>
                             </Box>
-                            {message.text}
+                            {message.text.startsWith(':sticker:') ?
+                                (
+                                    <Image
+                                        styleSheet={{
+                                            width: '15%',
+                                        }}
+                                        src={message.text.replace(':sticker:', '')}
+                                    />
+                                ) : (
+                                    message.text
+                                )}
                         </Text>
                         <Button
                             iconName='times'
